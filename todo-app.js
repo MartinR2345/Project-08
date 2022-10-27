@@ -1,25 +1,35 @@
-// From line 2 to line 3, I grabbing from the DOM the elements I want to use with the document.querySelector() and saving them to variables
+// From line 2 to line 3, I'm grabbing from the DOM the elements I want to use with the document.querySelector() and saving them to variables
 const todoItems = document.querySelector('#todos')
 const todoForm = document.querySelector('#todo-form')
 
-
-// On line 7, I'm fetch any existing "todos" from localStorage by checking to see if the JSON data actually exists by seeing if it's not equal to null
-const getFromLocalStorage = () => {
-    const todosJSON = localStorage.getItem('todos')
-    return todosJSON !== null ? JSON.parse(todosJSON) : [] 
+// On line 6 - I create a function called "getTodosFromAPI" to make an API request
+const getTodosFromAPI = () => {
+    // If there is nothing saved at the start in localStorage
+    if (localStorage.getItem("todos") == null) {
+        fetch('https://jsonplaceholder.typicode.com/todos/')
+        .then(response => response.json())
+        .then(jsonData => {   
+        // I'm looping through the first five items and grabbing the title and pushing the todo into the array of todos
+        for (let i = 0; i < 5; i++) {
+            todos.push(jsonData[i].title)
+        }
+        // I'm saving the todos to localStorage    
+            localStorage.setItem("todos", JSON.stringify(todos));
+        })
+    }
 }
 
 
-// On line 14, I created a variable called "todos" and assigning it to this function "getFromLocalStorage"
-let todos = getFromLocalStorage();
+// On line 24, I created a variable called "todos" and assigning it to this function "getFromLocalStorage"
+let todos = [];
 
 
-// On line 18, I'm adding/saving the todos to the localStorage
+// On line 28, I'm adding/saving the todos to the localStorage
 const addToLocalStorage = (todos) => {
     localStorage.setItem('todos', JSON.stringify(todos))
 }
 
-// From line 23 to line 47, basically
+// From line 32 to line 59, basically
 // When a user submits the HTML form by clicking on the button, it is doing a couple of things:
 // Cancel the default behavior -- preventing the page from refreshing with an updated URL
 // I created a variable called "text" that returns all the elements in an HTML Form.  I'm using the trim() method on that string to get the trimmed version for the text value
@@ -30,6 +40,8 @@ const addToLocalStorage = (todos) => {
 todoForm.addEventListener('submit', function (e) {
     e.preventDefault()
     
+    getTodosFromAPI();
+
     const text = e.target.elements.text.value.trim();
 
     if (text.length > 0){
@@ -46,12 +58,12 @@ todoForm.addEventListener('submit', function (e) {
     }
 })
 
-// On line 50, I made a filter's object.  This is going to keep track of the latest data.  This changes as the "searchText" search input changes down at the very bottom.
+// On line 62, I made a filter's object.  This is going to keep track of the latest data.  This changes as the "searchText" search input changes down at the very bottom.
 const filters = {
     searchText: ''
 }
 
-// From line 55 to line 99, (A-1) Get the DOM elements for an individual note.  This will generate the todo DOM element by taking the todo data and creating individual paragraphs with checkboxes and remove buttons.  This generates the todo element, which makes up the little element we show for each todo, that is the checkbox, our text and our button.
+// From line 67 to line 111, (A-1) Get the DOM elements for an individual note.  This will generate the todo DOM element by taking the todo data and creating individual paragraphs with checkboxes and remove buttons.  This generates the todo element, which makes up the little element we show for each todo, that is the checkbox, our text and our button.
 const generateTodoDOM = (todo) => {
     //Setup a root element (div) 
     const todoElement = document.createElement('div');
@@ -99,7 +111,7 @@ const generateTodoDOM = (todo) => {
 }
 
 
-// On line 103, (A-2) Get the DOM elements for list summary.  This function "generateSummary" is creating an h2 element and saving it to a variable called "summmary" and using the textContent to write a text then I'm returning that summary
+// On line 115, (A-2) Get the DOM elements for list summary.  This function "generateSummary" is creating an h2 element and saving it to a variable called "summmary" and using the textContent to write a text then I'm returning that summary
 const generateSummaryDOM = (incompleteTodos) => {
     const summary = document.createElement('h2')
     summary.textContent = `You have ${incompleteTodos.length} todos left`
@@ -107,7 +119,7 @@ const generateSummaryDOM = (incompleteTodos) => {
 }
 
 
-// On line 111, I'm rendering/displaying the todos application on the screen with this renderTodos function
+// On line 122, I'm rendering/displaying the todos application on the screen with this renderTodos function
 const renderTodos = function (todos, filters) {   
     //This line of code basically clears the div before rendering anything into it otherwise I’m going to get duplicate data.
     todoItems.innerHTML = ''
@@ -141,11 +153,11 @@ const renderTodos = function (todos, filters) {
     }
 }
 
-// On line 145, I'm calling the function renderTodos
+// On line 157, I'm calling the function renderTodos
 renderTodos(todos, filters)
 
 
-// On line 149, (R-1) removeButton PT2 (I made a "removeTodo" function that removes todo by ID)
+// On line 161, (R-1) removeButton PT2 (I made a "removeTodo" function that removes todo by ID)
 const removeTodo = (id) => {
     const todoIndex = todos.findIndex(todo => {
         return todo.id === id
@@ -158,7 +170,7 @@ const removeTodo = (id) => {
     }
 }
 
-// On line 163, (C-1) PT2 (I created a function called "toggleTodo" and this will toggle the completed value for a given todo)
+// On line 174, (C-1) PT2 (I created a function called "toggleTodo" and this will toggle the completed value for a given todo)
 const toggleTodo = (id) => {
     //I'm using the find() method to find the object and return the actually match 
     const todo = todos.find(todo => {
